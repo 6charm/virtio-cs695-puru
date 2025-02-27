@@ -69,7 +69,7 @@ notify = virtio_pci_find_capability(pci_dev, VIRTIO_PCI_CAP_NOTIFY_CFG,
 - This 	finds an mmio address to send notifications via `mdev->notify_base`
 Each device virtqueue has its own notification area starting at mdev->notify_base.
 The above function maps a large-ish chunk to ensure any number of virtqueues (and notifs)
-can be supported by the driver.
+can be supported by the pci device.
 ```
 /**
  * pci_iomap_range - create a virtual mapping cookie for a PCI BAR
@@ -133,4 +133,88 @@ err = device_add(&dev->dev);
 # STEP 5
 Once the device specific driver is reg, the probe() is called (this is our simple-probe/etc)
 - The virtio-pci funcs are thus made available to each virtio device via the config ops in 
-struct virtio_pci_device
+struct virtio_pci_device.
+
+
+## Interrupts (INTx, MSI, MSI-X)
+https://docs.kernel.org/PCI/msi-howto.html#c.pci_irq_vector - API	
+
+int pci_alloc_irq_vectors(struct pci_dev *dev, unsigned int min_vecs, unsigned int max_vecs, unsigned int flags);
+- Upon a successful allocation, the caller should use pci_irq_vector() to get the Linux IRQ number to be passed to request_threaded_irq(). 
+- The driver must call pci_free_irq_vectors() on cleanup.
+
+
+# STEP 6
+Driver registers interrupt lines (MSI-X/MSI/INTx) for each virtqueue
+used.
+Enable virtqueue: iowrite16 to an ioremapped address that is interpreted as a 
+control register, stored in struct virtio_pci_common_cfg
+```
+struct virtio_pci_common_cfg {
+	/* About the whole device. */
+	__le32 device_feature_select;	/* read-write */
+	__le32 device_feature;		/* read-only */
+	__le32 guest_feature_select;	/* read-write */
+	__le32 guest_feature;		/* read-write */
+	__le16 msix_config;		/* read-write */
+	__le16 num_queues;		/* read-only */
+	__u8 device_status;		/* read-write */
+	__u8 config_generation;		/* read-only */
+
+	/* About a specific virtqueue. */
+	__le16 queue_select;		/* read-write */
+	__le16 queue_size;		/* read-write, power of 2. */
+	__le16 queue_msix_vector;	/* read-write */
+	__le16 queue_enable;		/* read-write */
+	__le16 queue_notify_off;	/* read-only */
+	__le32 queue_desc_lo;		/* read-write */
+	__le32 queue_desc_hi;		/* read-write */
+	__le32 queue_avail_lo;		/* read-write */
+	__le32 queue_avail_hi;		/* read-write */
+	__le32 queue_used_lo;		/* read-write */
+	__le32 queue_used_hi;		/* read-write */
+};
+```
+This struct is part of an mdev i.e. virtio_pci_modern_device
+- this struct has a pointer to a struct that contains ioremapped 
+regions (i.e. the PCI device configuration space.)
+
+struct msix_entry {
+	u32	vector;	/* Kernel uses to write allocated vector */
+	u16	entry;	/* Driver uses to specify entry, OS writes */
+};
+
+
+/**
+ * msix_capability_init - configure device's MSI-X capability
+ * @dev: pointer to the pci_dev data structure of MSI-X device function
+ * @entries: pointer to an array of struct msix_entry entries
+ * @nvec: number of @entries
+ * @affd: Optional pointer to enable automatic affinity assignment
+ *
+ * Setup the MSI-X capability structure of device function with a
+ * single MSI-X IRQ. A return of zero indicates the successful setup of
+ * requested MSI-X entries with allocated IRQs or non-zero for otherwise.
+ **/
+static int msix_capability_init(struct pci_dev *dev, struct msix_entry *entries,
+				int nvec, struct irq_affinity *affd)
+
+
+
+/*
+ * vp_modern_set_queue_enable - enable a virtqueue
+ * @mdev: the modern virtio-pci device
+ * @index: the queue index
+ * @enable: whether the virtqueue is enable or not
+ */
+void vp_modern_set_queue_enable(struct virtio_pci_modern_device *mdev,
+				u16 index, bool enable)
+{
+	vp_iowrite16(index, &mdev->common->queue_select);
+	vp_iowrite16(enable, &mdev->common->queue_enable);
+}
+
+
+### PCI CORE auto-loads the driver module when the DEVICE_ID MATCH IS DETECTED
+- note that the device id is not the standard device id, but a virtio-speicific device id 
+see notes on qemu on host.
