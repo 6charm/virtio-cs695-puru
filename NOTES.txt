@@ -2,11 +2,6 @@
 must be known to the driver while using MODULE_DEVICE_TABLE()
 
 # STEP 1
- Called at initialisation of the PCI subsystem and by CardBus services.
- * Returns 0 on success and negative if unknown type of device (not normal,
- * bridge or CardBus).
- */
-
 /*
  * Read the config data for a PCI device, sanity-check it,
  * and fill in the dev structure.
@@ -17,7 +12,8 @@ device detected on the pci bus via pci_setup_device().
 
 
 // probe.c
-int pci_setup_device(struct pci_dev *dev)
+int pci_setup_device(struct pci_dev *dev): at boot time, pci_dev structs are initialized for 
+every device. (virtio--simple is [1af4:10f3] here)
 
 vm@cs695:~/virtio-simple$ sudo dmesg | grep class
 [sudo] password for vm: 
