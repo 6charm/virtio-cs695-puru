@@ -15,20 +15,27 @@ static void virtio_simple_recv_cb(struct virtqueue *vq)
         unsigned int len;
 
         while ((buf = virtqueue_get_buf(dev->vq, &len)) != NULL) {
-                /* process the received data */
+                pr_info("%c\n", buf[0]);
         }
 }
 
 static int virtio_simple_probe(struct virtio_device *vdev)
 {
         struct virtio_simple_dev *dev = NULL;
+        pr_info("virtio-simple FE probing...\n");
 
         /* initialize device data */
         dev = kzalloc(sizeof(struct virtio_simple_dev), GFP_KERNEL);
         if (!dev)
                 return -ENOMEM;
 
-        /* the device has a single virtqueue */
+        // setup ONE MSI-X interrupt line for ONE virtqueue (vp_request_msix_vectors)
+        // internal kernel funcs respect this by using 1 
+        // as nvqs.
+        // There is likely another function to ~register n kernel-side virtqueues.
+        // with their interrupts
+        // /proc/interrupts shows the result of driver interrupt registration
+        // info stored in irq_domain struct.
         dev->vq = virtio_find_single_vq(vdev, virtio_simple_recv_cb, "input"); // input virtqueue
         if (IS_ERR(dev->vq)) {
                 kfree(dev);
@@ -38,6 +45,8 @@ static int virtio_simple_probe(struct virtio_device *vdev)
         vdev->priv = dev;
 
         /* from this point on, the device can notify and get callbacks */
+        // performs mmio write to device , setting the status to VIRTIO_CONFIG_S_DRIVER_OK
+        // i.e. informing the device that the driver is ready to handle interrupts.
         virtio_device_ready(vdev);
 
         return 0;
@@ -54,24 +63,22 @@ static void virtio_simple_remove(struct virtio_device *vdev)
         virtio_reset_device(vdev);
 
         /* detach unused buffers */
-        while ((buf = virtqueue_detach_unused_buf(dev->vq)) != NULL) {
-                kfree(buf);
-        }
-
+        virtqueue_detach_unused_buf(dev->vq);
+        
         /* remove virtqueues */
         vdev->config->del_vqs(vdev);
 
         kfree(dev);
 }
 
-#define PCI_DEVICE_ID_VIRTIO_SIMPLE      0x10f3
+#define VIRTIO_ID_SIMPLE      42
 static const struct virtio_device_id id_table[] = {
-        { PCI_DEVICE_ID_VIRTIO_SIMPLE, VIRTIO_DEV_ANY_ID }, // {DEVICE_ID, VENDOR_ID}
+        {VIRTIO_ID_SIMPLE, VIRTIO_DEV_ANY_ID }, // {DEVICE_ID, VENDOR_ID}
         { 0 },
 };
 
 static struct virtio_driver virtio_simple_driver = {
-        .driver.name =  KBUILD_VIRTIO_SIMPLE,
+        .driver.name =  KBUILD_MODNAME,
         .id_table =     id_table,
         .probe =        virtio_simple_probe,
         .remove =       virtio_simple_remove,
