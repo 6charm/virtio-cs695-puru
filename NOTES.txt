@@ -123,7 +123,9 @@ static const struct virtio_config_ops virtio_pci_config_ops = {
 ```
 
 d.
-Register the virtio device virtio_register_device()
+Register the virtio device virtio_register_device(). Add the new virtio device to the "virtio" bus.
+pci_bus (pci_device) -> virtio_bus (virtio_pci_device)
+
 ```
 /*
 	* device_add() causes the bus infrastructure to look for a matching
@@ -133,10 +135,6 @@ err = device_add(&dev->dev);
 ```
 
 # STEP 5
-Once the device specific driver is reg, the probe() is called.
-
-
-
-# STEP 5
-Add the new virtio device to the "virtio" bus.
-pci_bus (pci_device) -> virtio_bus (virtio_pci_sdevice)
+Once the device specific driver is reg, the probe() is called (this is our simple-probe/etc)
+- The virtio-pci funcs are thus made available to each virtio device via the config ops in 
+struct virtio_pci_device
