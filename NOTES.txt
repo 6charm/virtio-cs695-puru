@@ -143,6 +143,8 @@ int pci_alloc_irq_vectors(struct pci_dev *dev, unsigned int min_vecs, unsigned i
 - Upon a successful allocation, the caller should use pci_irq_vector() to get the Linux IRQ number to be passed to request_threaded_irq(). 
 - The driver must call pci_free_irq_vectors() on cleanup.
 
+/proc/interrupts with virtio interrupt lines shows that device probe has been called successfully.
+
 
 # STEP 6
 Driver registers interrupt lines (MSI-X/MSI/INTx) for each virtqueue
@@ -218,3 +220,10 @@ void vp_modern_set_queue_enable(struct virtio_pci_modern_device *mdev,
 ### PCI CORE auto-loads the driver module when the DEVICE_ID MATCH IS DETECTED
 - note that the device id is not the standard device id, but a virtio-speicific device id 
 see notes on qemu on host.
+
+# Build instructions
+1. make
+2. compress via `zstd -z virtio-simple.ko -o virtio-simple.ko.zst`
+3. `sudo cp virtio-simple.ko.zst /lib/modules/$(uname -r)/kernel/drivers/virtio/`
+4. sudo depmod -a 
+(above is for autoload module - depmod is essential)
