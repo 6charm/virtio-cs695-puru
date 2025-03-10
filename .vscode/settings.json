@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "virtio_cs695_ioctl_common.h": "c",
+        "compare": "c",
+        "cstdint": "c"
+    }
+}

@@ -28,13 +28,13 @@ vm@cs695:~/virtio-simple$ sudo dmesg | grep class
 
 
 # STEP 2
-pci_device_add() -> int device_add(struct device *dev) : device_add creates the syfs entries, device file etc.
+pci_device_add() -> int device_add(struct device *dev) : device_add creates the sysfs entries, device file etc.
 pci_bus -> pci_dev
 - The pci_dev struct contains pointer to driver, which for virtio-devices is set to the virtio-pci driver
 
 # STEP 3
 Look for a driver for this initialized device
-bus_for_each_drv() : Each bus is assoc with a subsystem that has a set of loaded drivers (via bus to subsys)
+bus_for_each_drv() : Each bus is assoc with a subsystem that has a set of loaded drivers (via bus_to_subsys())
 __device_attach_driver() matches a driver based on vendor id and calls that driver's probe method. (aall virtio devices; using the 1af4 vendor id in table).
 
 void bus_probe_device(struct device *dev) -> device_initial_probe -> __device_attach_driver -> call_driver_probe()
@@ -62,7 +62,7 @@ pci_enable_device()->do_pci_enable_device()
 b. 
 virtio_pci_modern_probe(): access the config space, capabilities etc.
 ```
-notify = virtio_pci_find_capability(pci_dev, VIRTIO_PCI_CAP_NOTIFY_CFG,
+notify = 	(pci_dev, VIRTIO_PCI_CAP_NOTIFY_CFG,
 					IORESOURCE_IO | IORESOURCE_MEM,
 					&mdev->modern_bars);
 ```
@@ -70,6 +70,8 @@ notify = virtio_pci_find_capability(pci_dev, VIRTIO_PCI_CAP_NOTIFY_CFG,
 Each device virtqueue has its own notification area starting at mdev->notify_base.
 The above function maps a large-ish chunk to ensure any number of virtqueues (and notifs)
 can be supported by the pci device.
+
+vp_modern_map_capability()
 ```
 /**
  * pci_iomap_range - create a virtual mapping cookie for a PCI BAR
@@ -227,3 +229,9 @@ see notes on qemu on host.
 3. `sudo cp virtio-simple.ko.zst /lib/modules/$(uname -r)/kernel/drivers/virtio/`
 4. sudo depmod -a 
 (above is for autoload module - depmod is essential)
+
+# Device ioeventfd
+
+
+### virtio drivers dont need to use pci_register_driver() because all the mappings are handled automatically by the 
+virtio-pci core. 

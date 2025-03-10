@@ -1,8 +1,8 @@
-savedcmd_/home/vm/virtio-simple/virtio-simple.o := gcc-13 -Wp,-MMD,/home/vm/virtio-simple/.virtio-simple.o.d -nostdinc -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/compiler-version.h -include ./include/linux/kconfig.h -I./ubuntu/include -include ./include/linux/compiler_types.h -D__KERNEL__ -fmacro-prefix-map=./= -std=gnu11 -fshort-wchar -funsigned-char -fno-common -fno-PIE -fno-strict-aliasing -mno-sse -mno-mmx -mno-sse2 -mno-3dnow -mno-avx -fcf-protection=none -m64 -falign-jumps=1 -falign-loops=1 -mno-80387 -mno-fp-ret-in-387 -mpreferred-stack-boundary=3 -mskip-rax-setup -mtune=generic -mno-red-zone -mcmodel=kernel -Wno-sign-compare -fno-asynchronous-unwind-tables -mindirect-branch=thunk-extern -mindirect-branch-register -mindirect-branch-cs-prefix -mfunction-return=thunk-extern -fno-jump-tables -mharden-sls=all -fpatchable-function-entry=16,16 -fno-delete-null-pointer-checks -O2 -fno-allow-store-data-races -fstack-protector-strong -fno-omit-frame-pointer -fno-optimize-sibling-calls -ftrivial-auto-var-init=zero -fno-stack-clash-protection -fzero-call-used-regs=used-gpr -pg -mrecord-mcount -mfentry -DCC_USING_FENTRY -falign-functions=16 -fstrict-flex-arrays=3 -fno-strict-overflow -fno-stack-check -fconserve-stack -Wall -Wundef -Werror=implicit-function-declaration -Werror=implicit-int -Werror=return-type -Werror=strict-prototypes -Wno-format-security -Wno-trigraphs -Wno-frame-address -Wno-address-of-packed-member -Wmissing-declarations -Wmissing-prototypes -Wframe-larger-than=1024 -Wno-main -Wno-unused-but-set-variable -Wno-unused-const-variable -Wno-dangling-pointer -Wvla -Wno-pointer-sign -Wcast-function-type -Wno-stringop-overflow -Wno-array-bounds -Wno-alloc-size-larger-than -Wimplicit-fallthrough=5 -Werror=date-time -Werror=incompatible-pointer-types -Werror=designated-init -Wenum-conversion -Wno-unused-but-set-variable -Wno-unused-const-variable -Wno-restrict -Wno-packed-not-aligned -Wno-format-overflow -Wno-format-truncation -Wno-stringop-truncation -Wno-override-init -Wno-missing-field-initializers -Wno-type-limits -Wno-shift-negative-value -Wno-maybe-uninitialized -Wno-sign-compare -g -gdwarf-5 -Wall -g  -fsanitize=bounds-strict -fsanitize=shift -fsanitize=bool -fsanitize=enum  -DMODULE  -DKBUILD_BASENAME='"virtio_simple"' -DKBUILD_MODNAME='"virtio_simple"' -D__KBUILD_MODNAME=kmod_virtio_simple -c -o /home/vm/virtio-simple/virtio-simple.o /home/vm/virtio-simple/virtio-simple.c   ; ./tools/objtool/objtool --hacks=jump_label --hacks=noinstr --hacks=skylake --retpoline --rethunk --sls --stackval --static-call --uaccess --prefix=16   --module /home/vm/virtio-simple/virtio-simple.o
+savedcmd_/home/vm/virtio-cs695/driver/virtio-cs695.o := gcc -Wp,-MMD,/home/vm/virtio-cs695/driver/.virtio-cs695.o.d -nostdinc -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/compiler-version.h -include ./include/linux/kconfig.h -include ./include/linux/compiler_types.h -D__KERNEL__ -fmacro-prefix-map=./= -std=gnu11 -fshort-wchar -funsigned-char -fno-common -fno-PIE -fno-strict-aliasing -mno-sse -mno-mmx -mno-sse2 -mno-3dnow -mno-avx -fcf-protection=none -m64 -falign-jumps=1 -falign-loops=1 -mno-80387 -mno-fp-ret-in-387 -mpreferred-stack-boundary=3 -mskip-rax-setup -mtune=generic -mno-red-zone -mcmodel=kernel -Wno-sign-compare -fno-asynchronous-unwind-tables -mindirect-branch=thunk-extern -mindirect-branch-register -mindirect-branch-cs-prefix -mfunction-return=thunk-extern -fno-jump-tables -fpatchable-function-entry=16,16 -fno-delete-null-pointer-checks -O2 -fno-allow-store-data-races -fstack-protector-strong -fno-omit-frame-pointer -fno-optimize-sibling-calls -ftrivial-auto-var-init=zero -fno-stack-clash-protection -fzero-call-used-regs=used-gpr -pg -mrecord-mcount -mfentry -DCC_USING_FENTRY -falign-functions=16 -fstrict-flex-arrays=3 -fno-strict-overflow -fno-stack-check -fconserve-stack -Wall -Wundef -Werror=implicit-function-declaration -Werror=implicit-int -Werror=return-type -Werror=strict-prototypes -Wno-format-security -Wno-trigraphs -Wno-frame-address -Wno-address-of-packed-member -Wmissing-declarations -Wmissing-prototypes -Wframe-larger-than=1024 -Wno-main -Wno-unused-but-set-variable -Wno-unused-const-variable -Wno-dangling-pointer -Wvla -Wno-pointer-sign -Wcast-function-type -Wno-stringop-overflow -Wno-array-bounds -Wno-alloc-size-larger-than -Wimplicit-fallthrough=5 -Werror=date-time -Werror=incompatible-pointer-types -Werror=designated-init -Wenum-conversion -Wno-unused-but-set-variable -Wno-unused-const-variable -Wno-restrict -Wno-packed-not-aligned -Wno-format-overflow -Wno-format-truncation -Wno-stringop-truncation -Wno-missing-field-initializers -Wno-type-limits -Wno-shift-negative-value -Wno-maybe-uninitialized -Wno-sign-compare -g -gdwarf-5 -Wall -g   -fsanitize=kernel-address -fasan-shadow-offset=0xdffffc0000000000   --param asan-globals=1   --param asan-instrumentation-with-call-threshold=10000   --param asan-instrument-allocas=1   --param asan-stack=1   --param asan-kernel-mem-intrinsic-prefix=1  -fsanitize=bounds-strict -fsanitize=shift -fsanitize=bool -fsanitize=enum  -DMODULE  -DKBUILD_BASENAME='"virtio_cs695"' -DKBUILD_MODNAME='"virtio_cs695"' -D__KBUILD_MODNAME=kmod_virtio_cs695 -c -o /home/vm/virtio-cs695/driver/virtio-cs695.o /home/vm/virtio-cs695/driver/virtio-cs695.c   ; ./tools/objtool/objtool --hacks=jump_label --hacks=noinstr --hacks=skylake --retpoline --rethunk --stackval --static-call --uaccess --prefix=16   --module /home/vm/virtio-cs695/driver/virtio-cs695.o
 
-source_/home/vm/virtio-simple/virtio-simple.o := /home/vm/virtio-simple/virtio-simple.c
+source_/home/vm/virtio-cs695/driver/virtio-cs695.o := /home/vm/virtio-cs695/driver/virtio-cs695.c
 
-deps_/home/vm/virtio-simple/virtio-simple.o := \
+deps_/home/vm/virtio-cs695/driver/virtio-cs695.o := \
   include/linux/compiler-version.h \
     $(wildcard include/config/CC_VERSION_TEXT) \
   include/linux/kconfig.h \
@@ -103,8 +103,6 @@ deps_/home/vm/virtio-simple/virtio-simple.o := \
   arch/x86/include/asm/extable_fixup_types.h \
   arch/x86/include/asm/nops.h \
   include/linux/fortify-string.h \
-    $(wildcard include/config/CC_HAS_KASAN_MEMINTRINSIC_PREFIX) \
-    $(wildcard include/config/GENERIC_ENTRY) \
   include/linux/bug.h \
     $(wildcard include/config/GENERIC_BUG) \
     $(wildcard include/config/BUG_ON_DATA_CORRUPTION) \
@@ -259,12 +257,9 @@ deps_/home/vm/virtio-simple/virtio-simple.o := \
     $(wildcard include/config/DEBUG_PREEMPT) \
     $(wildcard include/config/TRACE_PREEMPT_TOGGLE) \
     $(wildcard include/config/PREEMPT_NOTIFIERS) \
-    $(wildcard include/config/PREEMPT_DYNAMIC) \
-    $(wildcard include/config/PREEMPT_NONE) \
-    $(wildcard include/config/PREEMPT_VOLUNTARY) \
-    $(wildcard include/config/PREEMPT) \
   include/linux/cleanup.h \
   arch/x86/include/asm/preempt.h \
+    $(wildcard include/config/PREEMPT_DYNAMIC) \
   arch/x86/include/asm/rmwcc.h \
   include/linux/args.h \
   arch/x86/include/asm/percpu.h \
@@ -310,6 +305,21 @@ deps_/home/vm/virtio-simple/virtio-simple.o := \
     $(wildcard include/config/X86_MEM_ENCRYPT) \
   include/linux/cc_platform.h \
     $(wildcard include/config/ARCH_HAS_CC_PLATFORM) \
+  arch/x86/include/uapi/asm/bootparam.h \
+  include/linux/screen_info.h \
+  include/uapi/linux/screen_info.h \
+  include/linux/apm_bios.h \
+  include/uapi/linux/apm_bios.h \
+  include/uapi/linux/ioctl.h \
+  arch/x86/include/generated/uapi/asm/ioctl.h \
+  include/asm-generic/ioctl.h \
+  include/uapi/asm-generic/ioctl.h \
+  include/linux/edd.h \
+  include/uapi/linux/edd.h \
+  arch/x86/include/asm/ist.h \
+  arch/x86/include/uapi/asm/ist.h \
+  include/video/edid.h \
+  include/uapi/video/edid.h \
   arch/x86/include/asm/nospec-branch.h \
     $(wildcard include/config/CALL_THUNKS_DEBUG) \
     $(wildcard include/config/CPU_IBPB_ENTRY) \
@@ -427,6 +437,7 @@ deps_/home/vm/virtio-simple/virtio-simple.o := \
   arch/x86/include/asm/frame.h \
   include/linux/thread_info.h \
     $(wildcard include/config/THREAD_INFO_IN_TASK) \
+    $(wildcard include/config/GENERIC_ENTRY) \
     $(wildcard include/config/HAVE_ARCH_WITHIN_STACK_FRAMES) \
     $(wildcard include/config/HARDENED_USERCOPY) \
     $(wildcard include/config/SH) \
@@ -460,10 +471,6 @@ deps_/home/vm/virtio-simple/virtio-simple.o := \
     $(wildcard include/config/TRACEPOINTS) \
   arch/x86/include/asm/cpumask.h \
   arch/x86/include/uapi/asm/msr.h \
-  include/uapi/linux/ioctl.h \
-  arch/x86/include/generated/uapi/asm/ioctl.h \
-  include/asm-generic/ioctl.h \
-  include/uapi/asm-generic/ioctl.h \
   arch/x86/include/asm/shared/msr.h \
   include/linux/tracepoint-defs.h \
   arch/x86/include/asm/special_insns.h \
@@ -491,6 +498,11 @@ deps_/home/vm/virtio-simple/virtio-simple.o := \
     $(wildcard include/config/ARCH_HAVE_NMI_SAFE_CMPXCHG) \
   arch/x86/include/asm/smp.h \
     $(wildcard include/config/DEBUG_NMI_SELFTEST) \
+  include/linux/debug_locks.h \
+  include/linux/stacktrace.h \
+    $(wildcard include/config/ARCH_STACKWALK) \
+    $(wildcard include/config/STACKTRACE) \
+    $(wildcard include/config/HAVE_RELIABLE_STACKTRACE) \
   arch/x86/include/generated/asm/mmiowb.h \
   include/asm-generic/mmiowb.h \
     $(wildcard include/config/MMIOWB) \
@@ -502,6 +514,7 @@ deps_/home/vm/virtio-simple/virtio-simple.o := \
   arch/x86/include/asm/qrwlock.h \
   include/asm-generic/qrwlock.h \
   include/linux/rwlock.h \
+    $(wildcard include/config/PREEMPT) \
   include/linux/spinlock_api_smp.h \
     $(wildcard include/config/INLINE_SPIN_LOCK) \
     $(wildcard include/config/INLINE_SPIN_LOCK_BH) \
@@ -539,7 +552,6 @@ deps_/home/vm/virtio-simple/virtio-simple.o := \
   include/linux/mutex.h \
     $(wildcard include/config/DEBUG_MUTEXES) \
   include/linux/osq_lock.h \
-  include/linux/debug_locks.h \
   include/linux/mutex_types.h \
     $(wildcard include/config/MUTEX_SPIN_ON_OWNER) \
   include/linux/seqlock_types.h \
@@ -689,18 +701,6 @@ deps_/home/vm/virtio-simple/virtio-simple.o := \
     $(wildcard include/config/X86_MPPARSE) \
   arch/x86/include/asm/mpspec_def.h \
   arch/x86/include/asm/x86_init.h \
-  arch/x86/include/uapi/asm/bootparam.h \
-  include/linux/screen_info.h \
-    $(wildcard include/config/PCI) \
-  include/uapi/linux/screen_info.h \
-  include/linux/apm_bios.h \
-  include/uapi/linux/apm_bios.h \
-  include/linux/edd.h \
-  include/uapi/linux/edd.h \
-  arch/x86/include/asm/ist.h \
-  arch/x86/include/uapi/asm/ist.h \
-  include/video/edid.h \
-  include/uapi/video/edid.h \
   arch/x86/include/asm/apicdef.h \
   include/asm-generic/topology.h \
   include/linux/cpu_smt.h \
@@ -716,14 +716,9 @@ deps_/home/vm/virtio-simple/virtio-simple.o := \
   include/asm-generic/resource.h \
   include/uapi/asm-generic/resource.h \
   include/linux/page_ext.h \
-  include/linux/stacktrace.h \
-    $(wildcard include/config/ARCH_STACKWALK) \
-    $(wildcard include/config/STACKTRACE) \
-    $(wildcard include/config/HAVE_RELIABLE_STACKTRACE) \
   include/linux/stackdepot.h \
-    $(wildcard include/config/STACKDEPOT) \
-    $(wildcard include/config/STACKDEPOT_MAX_FRAMES) \
     $(wildcard include/config/STACKDEPOT_ALWAYS_INIT) \
+    $(wildcard include/config/STACKDEPOT) \
   include/linux/page_ref.h \
     $(wildcard include/config/DEBUG_PAGE_REF) \
   include/linux/sizes.h \
@@ -784,6 +779,8 @@ deps_/home/vm/virtio-simple/virtio-simple.o := \
     $(wildcard include/config/ARCH_HAS_PARANOID_L1D_FLUSH) \
     $(wildcard include/config/RV) \
     $(wildcard include/config/USER_EVENTS) \
+    $(wildcard include/config/PREEMPT_NONE) \
+    $(wildcard include/config/PREEMPT_VOLUNTARY) \
   include/uapi/linux/sched.h \
   include/linux/pid_types.h \
   include/linux/sem_types.h \
@@ -854,6 +851,8 @@ deps_/home/vm/virtio-simple/virtio-simple.o := \
     $(wildcard include/config/KASAN_VMALLOC) \
   include/linux/kasan-enabled.h \
   include/linux/kasan-tags.h \
+  arch/x86/include/asm/kasan.h \
+    $(wildcard include/config/KASAN_SHADOW_OFFSET) \
   include/linux/memremap.h \
     $(wildcard include/config/DEVICE_PRIVATE) \
     $(wildcard include/config/PCI_P2PDMA) \
@@ -1019,6 +1018,7 @@ deps_/home/vm/virtio-simple/virtio-simple.o := \
     $(wildcard include/config/HAS_IOPORT_MAP) \
   include/asm-generic/iomap.h \
   include/asm-generic/pci_iomap.h \
+    $(wildcard include/config/PCI) \
     $(wildcard include/config/NO_GENERIC_PCI_IOPORT_MAP) \
     $(wildcard include/config/GENERIC_PCI_IOMAP) \
   include/linux/logic_pio.h \
@@ -1163,15 +1163,28 @@ deps_/home/vm/virtio-simple/virtio-simple.o := \
     $(wildcard include/config/HAS_DMA) \
     $(wildcard include/config/NEED_DMA_MAP_STATE) \
   include/linux/dma-direction.h \
+  include/linux/virtio_ring.h \
+  include/linux/irqreturn.h \
+  include/uapi/linux/virtio_ring.h \
+  include/uapi/linux/virtio_types.h \
   include/uapi/linux/virtio_ids.h \
   include/linux/virtio_config.h \
     $(wildcard include/config/VIRTIO_HARDEN_NOTIFICATION) \
   include/linux/virtio_byteorder.h \
-  include/uapi/linux/virtio_types.h \
   include/uapi/linux/virtio_config.h \
+  include/linux/miscdevice.h \
+  include/uapi/linux/major.h \
+  /home/vm/virtio-cs695/driver/virtio-cs695.h \
+  /home/vm/virtio-cs695/driver/ioctl.h \
+  /home/vm/virtio-cs695/driver/virtio_cs695_ioctl_common.h \
+  /home/vm/virtio-cs695/driver/virtio_cs695_ioctl_driver.h \
+  include/linux/delay.h \
+  arch/x86/include/asm/delay.h \
+  include/asm-generic/delay.h \
+  include/linux/cdev.h \
 
-/home/vm/virtio-simple/virtio-simple.o: $(deps_/home/vm/virtio-simple/virtio-simple.o)
+/home/vm/virtio-cs695/driver/virtio-cs695.o: $(deps_/home/vm/virtio-cs695/driver/virtio-cs695.o)
 
-$(deps_/home/vm/virtio-simple/virtio-simple.o):
+$(deps_/home/vm/virtio-cs695/driver/virtio-cs695.o):
 
-/home/vm/virtio-simple/virtio-simple.o: $(wildcard ./tools/objtool/objtool)
+/home/vm/virtio-cs695/driver/virtio-cs695.o: $(wildcard ./tools/objtool/objtool)

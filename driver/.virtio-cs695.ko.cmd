@@ -1,0 +1,1 @@
+savedcmd_/home/vm/virtio-cs695/driver/virtio-cs695.ko := ld -r -m elf_x86_64 -z noexecstack --no-warn-rwx-segments --build-id=sha1  -T scripts/module.lds -o /home/vm/virtio-cs695/driver/virtio-cs695.ko /home/vm/virtio-cs695/driver/virtio-cs695.o /home/vm/virtio-cs695/driver/virtio-cs695.mod.o
