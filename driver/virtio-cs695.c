@@ -9,6 +9,7 @@
 #include "ioctl.h"					   // ioctl numbers
 #include "virtio_cs695_ioctl_driver.h" // Driver-Specific header - Contains file operations, device data struct
 #include "virtio_cs695_ioctl_common.h" // App-Driver common datatypes: pa_val_t
+#include <linux/completion.h>
 
 #define DEVICE_NAME_MISC "virtio_cs695" // name in /dev
 
@@ -17,7 +18,8 @@ struct virtio_cs695
 {
 	struct virtio_device *vdev;
 	struct virtqueue *vq;
-	spinlock_t lock; // not sure of purposekmal
+	uint16_t mult_res;
+	struct completion req_done;
 };
 
 struct virtio_cs695 *v695 = NULL;
@@ -40,20 +42,20 @@ static void virtio_cs695_recv_cb(struct virtqueue *vq)
 	// Print the result (this is the multiplication result)
 	pr_info("Received multiplication result: %u\n", *result);
 }
-#endif
+
 
 static void virtio_cs695_recv_cb(struct virtqueue *vq)
 {
-	char *buf;
+	uint16_t *buf;
 	unsigned int len;
 
 	while ((buf = virtqueue_get_buf(vq, &len)) != NULL)
 	{
 		pr_info("Buf got len: %lu\n", len);
-		pr_info("res = %d\n", buf[0]);
-		pr_info("res = %d\n", buf[1]);
+		pr_info("res = %d\n", *buf);
 	}
 }
+#endif
 
 // virtio_notify from QEMU instantly triggers the callback
 // in guest.
@@ -67,37 +69,29 @@ static int virtio_cs695_open(struct inode *in, struct file *f)
 // - Backend handler responds to kick, reads the vq
 // - handler computes a new value and adds it to vq
 // - kicks and waits for response??
-static int do_multiply_vq(unsigned long arg)
+static void
+do_multiply_vq(cs695_req_t *req)
 {
-	struct mult_val12_t *m = (struct mult_val12_t *)arg;
 
-	struct scatterlist sg_out, sg_in;
-	uint16_t *res = kzalloc(sizeof(uint16_t), GFP_KERNEL); // To store the received multiplication result
-	struct virtqueue *vq = v695->vq;
+	struct scatterlist sg_out, sg_in, *sgs[2]; // outbuf, inbuf
 
-	// out req
-	sg_init_one(&sg_out, m, sizeof(struct mult_val12_t));
+	sg_init_one(&sg_out, &(req->m), sizeof(req->m));
+	sgs[0] = &sg_out;
 
-	// in resp
-	// tbh, output needs to be in a seperate virtqueue
-	sg_init_one(&sg_in, res, sizeof(uint16_t));
-	pr_info("both sg_init done\n");
+	sg_init_one(&sg_in, &(req->res), sizeof(req->res));
+	sgs[1] = &sg_in;
 
-	// Add buffer to the virtqueue
-	// #out elems in buf (sending data) = 1
-	// #in elems in buf (recv data expected) = 1
-	struct scatterlist *sgs[2] = {&sg_out, &sg_in};
-	if (virtqueue_add_sgs(vq, sgs, 1, 1, m, GFP_KERNEL) < 0)
-	{
-		pr_err("Failed to add buffer to virtqueue\n");
-		return -EAGAIN;
-	}
-	pr_info("both sgs added\n");
-	virtqueue_kick(vq); // notify. This should result in print in qemu.
+	// Key: out_sgs must be before the in_sgs in the sgs list.
+	// see virtqueue_add_sgs() ->  virtqueue_add_split() in linux kernel.
+	virtqueue_add_sgs(v695->vq, sgs, 1, 1, req, GFP_ATOMIC);
 
-	// kfree(res);
+	// only kick the outbuf vq
+	virtqueue_kick(v695->vq); // calls cs695_read_outbuf() in qemu
 
-	return 0;
+	// wait for response
+	// int len;
+	// while (virtqueue_get_buf(v695->vq, &len) == NULL)
+	// 	cpu_relax();
 }
 
 long virtio_cs695_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
@@ -106,14 +100,28 @@ long virtio_cs695_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 	{
 	case IOCTL_MULTIPLY:
 		// Copy value from user to kernel
-		struct mult_val12_t *m = kzalloc(sizeof(struct mult_val12_t), GFP_KERNEL);
+		multiplicands_t m;
 
-		if (copy_from_user(m, (struct mult_val12_t *)arg, sizeof(struct mult_val12_t)))
+		if (copy_from_user(&m, (struct mult_val12_t *)arg, sizeof(m)))
 		{
 			return -EFAULT;
 		}
-		pr_info("<%s>: IOCTL_MULTIPLY(%d, %d)\n", DEVICE_NAME_MISC, m->val_1, m->val_2);
-		int err = do_multiply_vq((unsigned long)m);
+		pr_info("<%s>: IOCTL_MULTIPLY(%d, %d)\n", DEVICE_NAME_MISC, m.val_1, m.val_2);
+
+		// create the req
+		cs695_req_t *req = kzalloc(sizeof(cs695_req_t), GFP_KERNEL);
+		req->m = m;
+		init_completion(&(v695->req_done));
+
+		do_multiply_vq(req); // becomes asynchronous with the callback
+		pr_info("Waiting for multiplication result...\n");
+		pr_info("Multiply result: %d\n", req->res);
+
+		wait_for_completion(&(v695->req_done));
+
+		// return mult result to user from the v695 device
+		copy_to_user(&((cs695_req_t *)arg)->res, &(v695->mult_res), sizeof(v695->mult_res));
+
 		break;
 	}
 	return 0;
@@ -133,6 +141,58 @@ static struct miscdevice virtio_cs695_miscdev = {
 	.fops = &virtio_cs695_fops,
 };
 
+#if 1
+// reads device-written data from inbufs
+static void virtio_cs695_inbufs_cb(struct virtqueue *vq)
+{
+	pr_info("cb reached\n");
+	cs695_req_t *req;
+	int len;
+	if ((req = virtqueue_get_buf(vq, &len)) != NULL)
+	{
+		pr_info("Response received in callback");
+		v695->mult_res = req->res;
+		complete(&(v695->req_done));
+	}
+}
+#endif
+
+// device never writes to outbuf vq.
+// So the only purpose here is to remove the
+// descriptor from the vq.
+#if 0
+static void virtio_cs695_outbufs_cb(struct virtqueue *vq)
+{
+	pr_info("outbufs cb called\n");
+	int len;
+	void *buf = virtqueue_get_buf(vq, &len); // this will be the original outbuf
+	/* free sent data */
+	if (buf)
+	{
+		kfree(buf);
+	}
+	return;
+}
+#endif
+
+#if 0
+static int virtio_cs695_assign_virtqueues(void)
+{
+	const char *names[] = {"cs695-outbufs", "cs695-inbufs"};
+	vq_callback_t *callbacks[] = {virtio_cs695_outbufs_cb, virtio_cs695_inbufs_cb};
+	struct virtqueue *vqs[2];
+
+	int err = virtio_find_vqs(v695->vdev, 2, vqs, callbacks, names, NULL);
+	if (err)
+	{
+		return err;
+	}
+	v695->tx_vq = vqs[0];
+	v695->rx_vq = vqs[1];
+	return 0;
+}
+#endif
+
 static int virtio_cs695_probe(struct virtio_device *vdev)
 {
 	pr_info("virtio-cs695 FE probing...\n");
@@ -147,28 +207,11 @@ static int virtio_cs695_probe(struct virtio_device *vdev)
 	vdev->priv = v695;
 	v695->vdev = vdev;
 
-	// setup ONE MSI-X interrupt line for ONE virtqueue (vp_request_msix_vectors)
-	// internal kernel funcs respect this by using nvqs=1.
-	// There is likely another function to ~register n kernel-side virtqueues.
-	// with their interrupts
-	// /proc/interrupts shows the result of driver interrupt registration
-	// info stored in irq_domain struct.
-	// ----------------------------------
-	// The callback function pointed by dev->vq is triggered when
-	// the device has consumed the buffers provided by the driver.
-	// - More specifically, the trigger will be an interrupt issued by the hypervisor (see vring_interrupt()).
-	// Interrupt request handlers are registered for a virtqueue
-	// during the virtqueue setup process (transport-specific).
-	v695->vq = virtio_find_single_vq(vdev, virtio_cs695_recv_cb, "cs695-input"); // input virtqueue
-	if (IS_ERR(v695->vq))
-	{
-		kfree(v695);
-		return PTR_ERR(v695->vq);
-	}
+#if 1
+	v695->vq = virtio_find_single_vq(vdev, virtio_cs695_inbufs_cb, "cs695-bidirectional"); // output virtqueue
+#endif
 
-	// print virtqueue info
-	uint vq_sz = virtqueue_get_vring_size(v695->vq);
-	pr_info("vq ring size: %d\n", vq_sz);
+	// int err1 = virtio_cs695_assign_virtqueues();
 
 	/* from this point on, the device can notify and get callbacks */
 	// performs mmio write to device , setting the status to VIRTIO_CONFIG_S_DRIVER_OK
@@ -181,10 +224,10 @@ static int virtio_cs695_probe(struct virtio_device *vdev)
 	// (44) 0001 0000 1001 0011 0000 0000 0000 0000 0000 0000 0010 #35 set -> IN_ORDER
 	pr_info("Virtio features: 0x%llx\n", features);
 
-	if (virtio_has_feature(vdev, VIRTIO_RING_F_EVENT_IDX))
-	{
-		pr_info("DND notifications possible\n");
-	}
+	// if (virtio_has_feature(vdev, VIRTIO_RING_F_EVENT_IDX))
+	// {
+	// 	pr_info("DND notifications possible\n");
+	// }
 
 	// finally, create the /dev file
 	int err = misc_register(&virtio_cs695_miscdev);

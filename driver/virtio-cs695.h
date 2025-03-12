@@ -3,4 +3,3 @@
  * --------------------
  * Header for virtio-cs695 misc driver.
  */
-

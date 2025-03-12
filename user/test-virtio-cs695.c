@@ -65,21 +65,22 @@ static void close_device(const char *driver_module_name, int driver_fd)
 int main(void)
 {
     // struct containing multiplicands
-    struct mult_val12_t *m = safe_malloc(sizeof(struct mult_val12_t));
-    m->val_1 = 5;
-    m->val_2 = 7;
+    cs695_req_t *u_req = safe_malloc(sizeof(cs695_req_t));
+    u_req->m.val_1 = 5;
+    u_req->m.val_2 = 7;
 
     int ioctl_device_fd = open_device(DEVICE_FILE_PATH);
 
-    if (ioctl(ioctl_device_fd, IOCTL_MULTIPLY, m) < 0)
+    if (ioctl(ioctl_device_fd, IOCTL_MULTIPLY, u_req) < 0)
     {
         error(e_FailedIoctlCommandV2P, errno, "IOCTL 0 failed.\n");
         exit(EXIT_FAILURE);
     }
+    printf("received result from device: %d\n", u_req->res);
 
     close_device(DEVICE_FILE_PATH, ioctl_device_fd);
 
-    free(m);
+    free(u_req);
 
     return EXIT_SUCCESS;
 }

@@ -235,3 +235,17 @@ see notes on qemu on host.
 
 ### virtio drivers dont need to use pci_register_driver() because all the mappings are handled automatically by the 
 virtio-pci core. 
+
+
+
+## vq mapping between host and guest
+```
+AC
+i know that findvqs in the driver adds msi-x interrupt lines visible in the /proc/interrupts.
+If I want to send data to one virtqueue and receive response in the other, would the i would need to add *inbuf to one vq and *outbuf to the other vq. A kick on the outbuf (from driver) should cause the correct handler at the backend to be triggered. 
+* The key idea is that we can have one vq just for outbufs (with corresp backend handler associated with that vq so that the correct callback is called.) right?
+My query is : add_outbuf is done after device probe and find_vqs(). So how does the virtio subsystem know that tx_vq of the guest corresponds to the tx_vq of the host?
+```
+# find_vqs() in driver() will map to a host virtqueue in the order that the host virtqueues were defined.
+This ensures that subsequent kicks to a vq by guest will reach the correct callback handler in qemu. (and vice versa)
+--> This also establishes that for bidirectional data flows (req-response), 2 vqs minumum are neccessary.
