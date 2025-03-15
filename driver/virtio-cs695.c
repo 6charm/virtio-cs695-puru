@@ -83,7 +83,12 @@ do_multiply_vq(cs695_req_t *req)
 
 	// Key: out_sgs must be before the in_sgs in the sgs list.
 	// see virtqueue_add_sgs() ->  virtqueue_add_split() in linux kernel.
-	virtqueue_add_sgs(v695->vq, sgs, 1, 1, req, GFP_ATOMIC);
+	int i = 0;
+	while (i < 5)
+	{
+		virtqueue_add_sgs(v695->vq, sgs, 1, 1, req, GFP_ATOMIC);
+		++i;
+	}
 
 	// only kick the outbuf vq
 	virtqueue_kick(v695->vq); // calls cs695_read_outbuf() in qemu
@@ -115,9 +120,9 @@ long virtio_cs695_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 
 		do_multiply_vq(req); // becomes asynchronous with the callback
 		pr_info("Waiting for multiplication result...\n");
-		pr_info("Multiply result: %d\n", req->res);
 
 		wait_for_completion(&(v695->req_done));
+		pr_info("Multiply result: %d\n", req->res);
 
 		// return mult result to user from the v695 device
 		copy_to_user(&((cs695_req_t *)arg)->res, &(v695->mult_res), sizeof(v695->mult_res));
@@ -157,9 +162,6 @@ static void virtio_cs695_inbufs_cb(struct virtqueue *vq)
 }
 #endif
 
-// device never writes to outbuf vq.
-// So the only purpose here is to remove the
-// descriptor from the vq.
 #if 0
 static void virtio_cs695_outbufs_cb(struct virtqueue *vq)
 {
@@ -272,6 +274,7 @@ static const struct virtio_device_id id_table[] = {
 
 #define VIRTIO_F_CS695_TEST 1
 #define VIRTIO_F_IN_ORDER 35
+
 static unsigned int features[] = {
 	// add features supported by device
 	VIRTIO_F_CS695_TEST,
@@ -299,5 +302,5 @@ module_virtio_driver(virtio_cs695_driver);
 // NOTE: During boot, the pci enumeration has already stored device id
 // in kernel structs.
 MODULE_DEVICE_TABLE(virtio, id_table);
-MODULE_DESCRIPTION("Driver for virtio-simple-pci");
+MODULE_DESCRIPTION("Driver for virtio-cs695-pci");
 MODULE_LICENSE("GPL");

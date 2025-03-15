@@ -19,9 +19,6 @@
 static const int e_FailedDeviceOpen = 1;
 static const int e_FailedDeviceClose = 2;
 static const int e_FailedIoctlCommandV2P = 4;
-// static const int e_FailedIoctlCommandSetValue = 8;
-// static const int e_FailedTestSetValue = 9;
-// static const int e_FailedIoctlCommandGetValue = 16;
 
 static const int e_FailedMalloc = 32;
 
